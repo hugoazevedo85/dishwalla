@@ -5,7 +5,9 @@ import java.time.ZoneId;
 import java.util.Date;
 
 import org.dishwalla.seguranca.configs.SecurityConstants;
+import org.springframework.security.authentication.AuthenticationServiceException;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jws;
@@ -42,6 +44,19 @@ public class TokenService {
 		return Jwts.parser()
 				.setSigningKey(SecurityConstants.TOKEN_SECRET_KEY)
 				.parseClaimsJws(token);
+	}
+	
+	
+	public String extractToken(String headerString) {
+		if (StringUtils.isEmpty(headerString)) {
+            throw new AuthenticationServiceException("Authorization header cannot be blank!");
+        }
+
+        if (headerString.length() < SecurityConstants.TOKEN_PREFIX.length()) {
+            throw new AuthenticationServiceException("Invalid authorization header size.");
+        }
+
+        return headerString.substring(SecurityConstants.TOKEN_PREFIX.length(), headerString.length());
 	}
 	
 	
