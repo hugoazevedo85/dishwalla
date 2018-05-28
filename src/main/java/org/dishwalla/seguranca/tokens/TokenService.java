@@ -4,15 +4,21 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Date;
 
+import org.dishwalla.exceptions.JwtExpiredTokenException;
 import org.dishwalla.seguranca.configs.SecurityConstants;
 import org.springframework.security.authentication.AuthenticationServiceException;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.SignatureException;
+import io.jsonwebtoken.UnsupportedJwtException;
 
 @Service
 public class TokenService {
@@ -41,9 +47,17 @@ public class TokenService {
 	
 	
 	public Jws<Claims> getTokenClaims(String token){
-		return Jwts.parser()
-				.setSigningKey(SecurityConstants.TOKEN_SECRET_KEY)
-				.parseClaimsJws(token);
+		try {
+			return Jwts.parser()
+					.setSigningKey(SecurityConstants.TOKEN_SECRET_KEY)
+					.parseClaimsJws(token);
+		
+		} catch (UnsupportedJwtException | MalformedJwtException | IllegalArgumentException | SignatureException ex) {
+			throw new BadCredentialsException("Token inválido",ex);
+		}
+		catch(ExpiredJwtException expired) {
+			throw new JwtExpiredTokenException("Token Expirado", expired);
+		}
 	}
 	
 	

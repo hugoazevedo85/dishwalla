@@ -35,9 +35,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter{
 	private CustomerService customerService;
 	
 	@Autowired
-	private BCryptPasswordEncoder encoder;
-	
-	@Autowired
 	private ObjectMapper objectMapper;
 	
 	@Autowired
@@ -49,8 +46,13 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter{
 	@Autowired
 	private TokenService tokenService;
 	
+	private final String API_PREFIX = "/api/v1";
 	
-	private final List<String> publicPath = Arrays.asList(new String[] {"/api/public/**"});
+	
+	private final List<String> publicPath = 
+			Arrays.asList(new String[] { API_PREFIX + "/Cousine",
+										 API_PREFIX + "/Cousine/search/*",
+										 API_PREFIX + "/Store"});
 	
 	
 	@Override
@@ -64,7 +66,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter{
 		http.csrf().disable().cors()
 			.and()
 			.authorizeRequests()
-			.antMatchers(HttpMethod.POST,"/api/auth").permitAll()
+			.antMatchers(HttpMethod.POST,API_PREFIX + "/Customer/auth").permitAll()
+			.antMatchers(publicPath.toArray(new String[publicPath.size()])).permitAll()
 			.anyRequest().authenticated()
 			.and()
 			.addFilterBefore(new CorsFilter(), UsernamePasswordAuthenticationFilter.class)
@@ -81,7 +84,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter{
 	
 	private DaoAuthenticationProvider daoAuthenticationProvider() {
 		DaoAuthenticationProvider daoAuthenticationProvider = new DaoAuthenticationProvider();
-		daoAuthenticationProvider.setPasswordEncoder(encoder);
+		daoAuthenticationProvider.setPasswordEncoder(bryptPasswordEncoder());
 		daoAuthenticationProvider.setUserDetailsService(customerService);
 		return daoAuthenticationProvider;
 	}
@@ -94,7 +97,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter{
 	
 	private UsernamePasswordCredentialsFilter usernamePasswordCredentialsFilter(AuthenticationManager manager) {
 		UsernamePasswordCredentialsFilter usernamePasswordCredentialsFilter =
-				new UsernamePasswordCredentialsFilter("/api/auth",objectMapper,manager);
+				new UsernamePasswordCredentialsFilter(API_PREFIX + "/Customer/auth",objectMapper,manager);
 		usernamePasswordCredentialsFilter.setAuthenticationSuccessHandler(authSuccessHandler);
 		usernamePasswordCredentialsFilter.setAuthenticationFailureHandler(authFailureHandler);
 		return usernamePasswordCredentialsFilter;

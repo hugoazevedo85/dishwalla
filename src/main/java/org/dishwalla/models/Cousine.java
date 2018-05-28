@@ -10,8 +10,9 @@ public class Cousine {
 
 	@Id
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
-	
 	private int id;
+	private String name;
+	
 	public int getId() {
 		return id;
 	}
@@ -24,6 +25,5 @@ public class Cousine {
 	public void setName(String name) {
 		this.name = name;
 	}
-	private String name;
 	
 }

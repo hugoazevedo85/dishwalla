@@ -7,6 +7,7 @@ import org.springframework.validation.FieldError;
 import org.springframework.validation.ObjectError;
 
 public class GenericResponse {
+		
     private String message;
     private String error;
 
@@ -25,7 +26,7 @@ public class GenericResponse {
         this.error = error;
         String temp = allErrors.stream().map(e -> {
             if (e instanceof FieldError) {
-                return "{\"field\":\"" + ((FieldError) e).getField() + "\",\"defaultMessage\":\"" + e.getDefaultMessage() + "\"}";
+                return "{field:" + ((FieldError) e).getField() + ",defaultMessage:" + e.getDefaultMessage() + "}";
             } else {
                 return "{\"object\":\"" + e.getObjectName() + "\",\"defaultMessage\":\"" + e.getDefaultMessage() + "\"}";
             }
@@ -33,7 +34,7 @@ public class GenericResponse {
         this.message = "[" + temp + "]";
     }
 
-    public String getMessage() {
+	public String getMessage() {
         return message;
     }
 
